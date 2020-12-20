@@ -13,25 +13,25 @@ const client = new Client();
 const PREFIX = "$$";
 
 // Query Riot API 
-function getSummonerInfo (inputString) {
-    // e.g. "https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/Gyromite"
-    const URL_PART = "summoner/v4/summoners/by-name/" + inputString;
+// function getSummonerInfo (inputString) {
+//     // e.g. "https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/Gyromite"
+//     const URL_PART = "summoner/v4/summoners/by-name/" + inputString;
 
-    const QSTRING = RIOT_NA1 + URL_PART + API_KEY;
-    console.log(QSTRING);
-    axios.get(QSTRING)
-        .then(function (response) {
-            console.log(response.data)
-        })
-        .catch(function (error) {
-            console.log("error: " + error)
-        })
-        .then(function () {
-            console.log("always executed")
-        });
+//     const QSTRING = RIOT_NA1 + URL_PART + API_KEY;
+//     console.log(QSTRING);
+//     axios.get(QSTRING)
+//         .then(function (response) {
+//             console.log(response.data)
+//         })
+//         .catch(function (error) {
+//             console.log("error: " + error)
+//         })
+//         .then(function () {
+//             console.log("always executed")
+//         });
     
-    return "info"
-}
+//     return "info"
+// }
 
 // Callback function on ready event, which is fired when the bot comes online
 client.on('ready', () => {
@@ -54,7 +54,7 @@ client.on('message', (message) => {
 client.on("message", (message) => {
     const CHANNEL = client.channels.cache.get(message.channel.id);
 
-
+    // Ignore bots.
     if (message.author.bot) return;
     if (message.content.startsWith(PREFIX)) {
         // using array destructuring to turn a content string into a command name and a list of arguments.
@@ -67,6 +67,8 @@ client.on("message", (message) => {
         console.log("With argument(s): " + args);
 
         if (CMD_NAME.toLowerCase() === "summoner") {
+            //turning off for now
+            return
             if (args.length === 1) {
                 message.reply("Yes, you have asked about " + args[0] + ". Here is what I know:");
                 
@@ -85,50 +87,29 @@ client.on("message", (message) => {
                     .then(function () {
                         console.log("always executed")
                     });
-
-
-
-
-
             }
         }
 
-        if (CMD_NAME.toLowerCase() === "lore") {
+        if (CMD_NAME.toLowerCase() === "whois") {
             if (args.length === 1) {
                 // TODO validate against champion list
                 
-                const CHAMP_NAME = capFirstLetter(args[0].toLowerCase());
-                const QSTRING = `http://ddragon.leagueoflegends.com/cdn/10.25.1/data/en_US/champion/${CHAMP_NAME}.json`;
+                const CHAMP_NAME = standardizeChampName(args[0]);
+                const QSTRING = `http://ddragon.leagueoflegends.com/cdn/10.25.1/data/en_US/champion/${CHAMP_NAME[0]}.json`;
                 console.log(QSTRING);
                 axios.get(QSTRING)
                     .then(function (response) {
-                        let desc = response.data.data[CHAMP_NAME].lore;
-                        let img = `http://ddragon.leagueoflegends.com/cdn/img/champion/splash/${CHAMP_NAME}_0.jpg`;
+                        let desc = response.data.data[CHAMP_NAME[0]].lore;
+                        let img = `http://ddragon.leagueoflegends.com/cdn/img/champion/splash/${CHAMP_NAME[0]}_0.jpg`;
+                        
+                        // Construct an embedded message object
+                        // see https://discordjs.guide/popular-topics/embeds.html#embed-preview
                         const MESSAGE = new Discord.MessageEmbed()
                             .setDescription(desc)
-                            .setImage(img);
+                            .setImage(img)
+                            .setTitle(CHAMP_NAME[1]);
+
                         CHANNEL.send(MESSAGE);
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        //CHANNEL.send(response.data.data[CHAMP_NAME].lore)
-                        
-
-
-
-
-
-
-
                     })
                     .catch(function (error) {
                         console.log("error: " + error)
@@ -142,7 +123,30 @@ client.on("message", (message) => {
 // log the bot in
 client.login(process.env.DISCORDJS_BOT_TOKEN);
 
+
+function standardizeChampName(inputString) {
+    standardName = capFirstLetter(inputString);
+    displayName = standardName;
+    if (standardName === "Kai'sa" || standardName === "Kaisa") {
+        standardName = "Kaisa";
+        displayName = "Kai'Sa"
+    }
+
+    if (standardName === "Susan") {
+        standardName = "Nasus";
+        displayName = "Susan"
+    }
+
+    if (standardName === "Devil") {
+        standardName = "Teemo";
+        displayName = "Teemo"
+    }
+
+    return [standardName,displayName]
+}
+
 function capFirstLetter(inputString) {
+    inputString = inputString.toLowerCase();
     return inputString.charAt(0).toUpperCase() + inputString.slice(1)
 }
 

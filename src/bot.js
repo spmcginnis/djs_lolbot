@@ -10,7 +10,7 @@ const RIOT_NA1 = "https://na1.api.riotgames.com/lol/";
 const client = new Client();
 
 // set prefix
-const PREFIX = "$$";
+const PREFIX = "lolbot ";
 
 // Query Riot API 
 // function getSummonerInfo (inputString) {
@@ -91,24 +91,47 @@ client.on("message", (message) => {
         }
 
         if (CMD_NAME.toLowerCase() === "whois") {
-            if (args.length === 1) {
+            if (args.length === 0 || args[0] == "help") {
+                const MESSAGE =  new Discord.MessageEmbed()
+                    .setTitle("lolbot help")
+                    .setDescription("lolbot whois <champion name>");
+                CHANNEL.send(MESSAGE)
+            }
+            
+            if (args.length >= 1) {
                 // TODO validate against champion list
-                
+                // TODO fix problem with multiple word names e.g. Miss Fortune
                 const CHAMP_NAME = standardizeChampName(args[0]);
                 const QSTRING = `http://ddragon.leagueoflegends.com/cdn/10.25.1/data/en_US/champion/${CHAMP_NAME[0]}.json`;
                 console.log(QSTRING);
                 axios.get(QSTRING)
                     .then(function (response) {
-                        let desc = response.data.data[CHAMP_NAME[0]].lore;
+                        let champ = response.data.data[CHAMP_NAME[0]];
+                        let desc = champ.lore;
                         let img = `http://ddragon.leagueoflegends.com/cdn/img/champion/splash/${CHAMP_NAME[0]}_0.jpg`;
-                        
+                        let tip = function () {
+                            let tipCat = "allytips";
+                            let choice = Math.floor(Math.random()*2);
+                            if (choice === 1) {
+                                tipCat = "enemytips"
+                            }
+                            choice = Math.floor(Math.random() * champ[tipCat].length);
+                            
+                            let tip = champ[tipCat][choice];
+                            if (typeof(tip) != "undefined") {
+                                return "Rito Super Tip:  " + tip
+                            }
+                            return ""
+                            
+                        }
                         // Construct an embedded message object
                         // see https://discordjs.guide/popular-topics/embeds.html#embed-preview
                         const MESSAGE = new Discord.MessageEmbed()
                             .setDescription(desc)
                             .setImage(img)
-                            .setTitle(CHAMP_NAME[1]);
-
+                            .setTitle(CHAMP_NAME[1])
+                            .setFooter(tip());
+                            
                         CHANNEL.send(MESSAGE);
                     })
                     .catch(function (error) {
@@ -140,6 +163,21 @@ function standardizeChampName(inputString) {
     if (standardName === "Devil") {
         standardName = "Teemo";
         displayName = "Teemo"
+    }
+
+    if (standardName === "Miss" || standardName === "Mf") {
+        standardName = "MissFortune";
+        displayName = "Miss Fortune"
+    }
+
+    if (standardName === "Kha'zix") {
+        standardName = "Khazix";
+        displayName = "Kha'Zix"
+    }
+
+    if (standardName === "Tahm" || standardName === "Kench") {
+        standardName = "TahmKench";
+        displayName = "Tahm Kench"
     }
 
     return [standardName,displayName]

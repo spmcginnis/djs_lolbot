@@ -8,3 +8,10 @@ A Discord bot using discord.js to query champion data from the Riot Games API.
 ## Completed
 - Responds to Discord commands with prefix "lolbot "
 - "whois" command queries chamption lore, splash art, and a random tip (when available).
+
+## Dependencies
+- node
+- nodemon
+- axios
+- discord.js
+- dotenv

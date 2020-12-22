@@ -2,6 +2,7 @@ require('dotenv').config();
 const { Client } = require('discord.js'); // Client extends EventEmitter
 const DIS = require('discord.js');
 const AXIOS = require('axios');
+const FS = require('fs');
 
 const API_KEY = "?api_key=" + process.env.RIOT_DEV_TEMP_TOKEN;
 const RIOT_NA1 = "https://na1.api.riotgames.com/lol/";
@@ -12,11 +13,15 @@ const client = new Client();
 // set prefix
 const PREFIX = "lolbot ";
 
+// log the bot in
+client.login(process.env.DISCORDJS_BOT_TOKEN);
+
 // Callback function on ready event, which is fired when the bot comes online
 client.on('ready', () => {
     // tag is the unique id in discord. cf. client.user.username
     console.log(`${client.user.tag} has logged in.`)
 });
+
 
 // Callback function takes the message object as a parameter
 client.on('message', (message) => {
@@ -29,10 +34,54 @@ client.on('message', (message) => {
     }
 });
 
-// Handling command messages and arguments. async keyword in front of the callback function allows us to wait for a 'promise.'
+client.on("message", (message) => {
+    if (message.author.bot) {
+        return
+    }
+
+    if (!message.content.startsWith(PREFIX)) {
+        if (message.content.startsWith(PREFIX.trim())) {
+            message.reply("Placeholder for help message")
+        }
+        return
+    }
+
+    // prefix detected with at least one argument
+
+    // store command and args as a string
+    const CMD_LINE = message.content
+        .substring(PREFIX.length) // remove the prefix
+        .trim()
+        .replace(/\s+/, " ") // replace any number of blankspaces with just one
+        .toLowerCase()
+
+    const CMD_NAME = CMD_LINE.split(" ")[0]
+    const ARG_STRING = CMD_LINE
+        .substring(CMD_NAME.length)
+        .trim()
+
+    console.log(`Command: ${CMD_NAME} recieved with arguments: ${ARG_STRING}`)
+    console.log(`and args as list: ${listArgs(ARG_STRING)}`)
+
+
+
+
+    let testingFile = FS.readFileSync("./src/data/champion.json", "utf-8")
+    console.log(JSON.parse(testingFile))
+
+    
+})
+
+function listArgs(inputString) {
+    let args = inputString
+    return args.split(" ")
+}
+
+// Handling command messages and arguments.
 client.on("message", (message) => {
     const CHANNEL = client.channels.cache.get(message.channel.id);
-
+    // disabling for dev purposes
+    return
     // Ignore bots.
     if (message.author.bot) return;
     if (message.content.startsWith(PREFIX)) {
@@ -124,8 +173,6 @@ client.on("message", (message) => {
     }
 });
 
-// log the bot in
-client.login(process.env.DISCORDJS_BOT_TOKEN);
 
 
 function standardizeChampName(inputString) {

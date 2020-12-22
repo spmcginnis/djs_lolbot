@@ -48,6 +48,9 @@ client.on("message", (message) => {
 
     // prefix detected with at least one argument
 
+    // get channel id
+    const CHANNEL = client.channels.cache.get(message.channel.id);
+
     // store command and args as a string
     const CMD_LINE = message.content
         .substring(PREFIX.length) // remove the prefix
@@ -63,11 +66,22 @@ client.on("message", (message) => {
     console.log(`Command: ${CMD_NAME} recieved with arguments: ${ARG_STRING}`)
     console.log(`and args as list: ${listArgs(ARG_STRING)}`)
 
+    if (CMD_NAME === "whois") {
+        const CHAMP_LIST = JSON.parse(FS.readFileSync("./src/data/champion.json", "utf-8"))
+        
+        let champStdName = "Akali" // placeholder for standardized name function
+        let champDisplayName = CHAMP_LIST.data[champStdName].name
+        let blurb = CHAMP_LIST.data[champStdName].blurb
+        let title = CHAMP_LIST.data[champStdName].title
+        const MESSAGE = new DIS.MessageEmbed()
+            .setDescription(blurb)
+            //.setImage(img)
+            .setTitle(champDisplayName + ", " + title)
+            .setFooter("placeholder");
+        
+    CHANNEL.send(MESSAGE);
+    }
 
-
-
-    let testingFile = FS.readFileSync("./src/data/champion.json", "utf-8")
-    console.log(JSON.parse(testingFile))
 
     
 })

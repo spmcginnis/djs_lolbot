@@ -54,13 +54,24 @@ function writeData(data, filePath) {
     console.log(`Write complete: ${filePath}`)
 }
 
-function updateMetadata() {
+function updateChampions() {
     const CHAMP_LIST = JSON.parse(FS.readFileSync("./src/data/champion.json", "utf-8"))
 
     // TODO save index of champ names, aliases, and ids
     for ( let champ in CHAMP_LIST.data) {
-        console.log(CHAMP_LIST.data[champ].name)
+        let dir = `./src/data/${champ}`
+        if (!FS.existsSync(dir)) {
+            FS.mkdirSync(dir)
+        }
+
+        const FILE_NAME = `${champ}.json`;
+
+        
+
+        FS.writeFileSync(`${dir}/${FILE_NAME}` , "data")
+
     }
+
 }
 
 async function setEtag(etag) {
@@ -73,10 +84,9 @@ async function main () {
     await getChampList()
     if (hasNewEtag) {
         await setEtag(etag)
-        console.log("new etag set")
     }
     
-    // updateMetadata()
+    updateChampions()
 }
 
 main()

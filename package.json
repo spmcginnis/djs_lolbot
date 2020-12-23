@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node ./src/app.js",
     "dev": "nodemon ./src/app.js",
-    "updateData": "node ./src/updateRiotData.js"
+    "update": "node ./src/updateRiotData.js"
   },
   "keywords": [],
   "author": "",

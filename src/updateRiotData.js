@@ -11,14 +11,21 @@ const BRANCH_CHAMP_LIST =  "data/en_US/";
 const BRANCH_CHAMP_DETAILS = "data/en_US/champion/"
 const BRANCH_SPLASH = "img/champion/splash/"
 
-// Delay to avoid going over rate limites
+// To delay in order to avoid going over rate limits
 const DELAY = (ms) => new Promise(res => setTimeout(res, ms))
+
+// To make directories if they don't already exist
+const MKDIR = (dir) => {
+    if (!FS.existsSync(dir)) {
+        FS.mkdirSync(dir)
+    }
+}
 
 // Etag for version checking
 let etag = FS.readFileSync("./src/data/etag.txt", "utf-8");
 let hasNewEtag = false;
-
 console.log("First etag: ", etag)
+
 // Queries the Riot API
 function getChampList() {
     const FILE_NAME = "champion.json";
@@ -62,18 +69,15 @@ function writeData(data, filePath) {
     console.log(`Write complete: ${filePath}`)
 }
 
+// get and store champion detail files and splash art w/ wait time
 async function updateChampions() {
     const CHAMP_LIST = JSON.parse(FS.readFileSync("./src/data/champion.json", "utf-8"))
     let qString;
-    // get and store champion detail files and splash art w/ wait time
 
     for ( let champ in CHAMP_LIST.data) {
 
-    
         let dir = `./src/data/${champ}`
-        if (!FS.existsSync(dir)) {
-            FS.mkdirSync(dir)
-        }
+        MKDIR(dir)
 
         // get and store champion details file
         qString = ROOT + PATCH + BRANCH_CHAMP_DETAILS + champ + ".json"
@@ -122,6 +126,9 @@ async function setEtag(etag) {
 }
 
 async function main () {
+    // check if data directory exists and make it if it doesn't
+    MKDIR(`./src/data`)
+
     // use await to wait for the completion of a function-- that function must return a promise.
     await getChampList()
     if (hasNewEtag) {

@@ -2,9 +2,17 @@ const FS = require('fs');
 const AXIOS = require('axios');
 
 // RIOT API
+// Single file with limited info on each champion: http://ddragon.leagueoflegends.com/cdn/10.25.1/data/en_US/champion.json
+// Champion details file: http://ddragon.leagueoflegends.com/cdn/10.25.1/data/en_US/champion/Aatrox.json
+// Champion splash art: http://ddragon.leagueoflegends.com/cdn/img/champion/splash/Aatrox_0.jpg
 const ROOT = "http://ddragon.leagueoflegends.com/cdn/";
 const PATCH = "10.25.1/";
-const BRANCH =  "data/en_US/";
+const BRANCH_CHAMP_LIST =  "data/en_US/";
+const BRANCH_CHAMP_DETAILS = "data/en_US/champion/"
+const BRANCH_SPLASH = "img/champion/splash/"
+
+// Delay to avoid going over rate limites
+const DELAY = (ms) => new Promise(res => setTimeout(res, ms))
 
 // Etag for version checking
 let etag = FS.readFileSync("./src/data/etag.txt", "utf-8");
@@ -16,7 +24,7 @@ function getChampList() {
     const FILE_NAME = "champion.json";
 // Single file with limited info on each champion:
 // http://ddragon.leagueoflegends.com/cdn/10.25.1/data/en_US/champion.json
-    const QSTRING = ROOT + PATCH + BRANCH + FILE_NAME
+    const QSTRING = ROOT + PATCH + BRANCH_CHAMP_LIST + FILE_NAME
     
     // sets the request header to check the etag
     let config = {
@@ -54,25 +62,59 @@ function writeData(data, filePath) {
     console.log(`Write complete: ${filePath}`)
 }
 
-function updateChampions() {
+async function updateChampions() {
     const CHAMP_LIST = JSON.parse(FS.readFileSync("./src/data/champion.json", "utf-8"))
+    let qString;
+    // get and store champion detail files and splash art w/ wait time
 
-    // TODO save index of champ names, aliases, and ids
     for ( let champ in CHAMP_LIST.data) {
+
+    
         let dir = `./src/data/${champ}`
         if (!FS.existsSync(dir)) {
             FS.mkdirSync(dir)
         }
 
-        const FILE_NAME = `${champ}.json`;
+        // get and store champion details file
+        qString = ROOT + PATCH + BRANCH_CHAMP_DETAILS + champ + ".json"
+        console.log(qString)
+        AXIOS.get(qString)
+        .then(
+            (response) => {
+                FS.writeFileSync(`${dir}/${champ}.json` , JSON.stringify(response.data))
+            }
+        )
+        .catch(
+            (error) => {
+                console.log("error: " + error)
+                throw error
+            }
+        )
 
-        
-
-        FS.writeFileSync(`${dir}/${FILE_NAME}` , "data")
-
+        // get and store splash art
+        qString = ROOT + BRANCH_SPLASH + champ + "_0.jpg"
+        console.log(qString)
+        AXIOS.get(qString, {responseType: 'arraybuffer'})
+        // the responseType: arraybuffer option is necessary to correctly format the image data into a local file
+        // see https://stackoverflow.com/questions/41846669/download-an-image-using-axios-and-convert-it-to-base64
+        .then(
+            (response) => {
+                FS.writeFileSync(`${dir}/${champ}_0.jpg` , response.data)
+            }
+        )
+        .catch(
+            (error) => {
+                console.log("error: " + error)
+                throw error
+            }
+        )
+        await DELAY(2450)
     }
 
+    // TODO save index of champ names, aliases, and ids
 }
+
+
 
 async function setEtag(etag) {
     hasNewEtag = false;

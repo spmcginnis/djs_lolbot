@@ -39,10 +39,8 @@ client.on("message", (message) => {
         return
     }
 
-    if (!message.content.startsWith(PREFIX)) {
-        if (message.content.startsWith(PREFIX.trim())) {
-            message.reply("Placeholder for help message")
-        }
+    if (message.content.startsWith(PREFIX.trim()) && message.content.length <= PREFIX.length) {
+        message.reply("Placeholder for help message")
         return
     }
 
@@ -67,17 +65,40 @@ client.on("message", (message) => {
     console.log(`and args as list: ${listArgs(ARG_STRING)}`)
 
     if (CMD_NAME === "whois") {
+        
         const CHAMP_LIST = JSON.parse(FS.readFileSync("./src/data/champion.json", "utf-8"))
         
-        let champStdName = "Akali" // placeholder for standardized name function
-        let champDisplayName = CHAMP_LIST.data[champStdName].name
+        let champStdName = standardizeChampName(ARG_STRING).standardName // TODO handle bad input
+
+        console.log("champStdName: ", champStdName)
+        
+        let champDisplayName = standardizeChampName(ARG_STRING).displayName
         let blurb = CHAMP_LIST.data[champStdName].blurb
         let title = CHAMP_LIST.data[champStdName].title
+        let splashURL = `http://ddragon.leagueoflegends.com/cdn/img/champion/splash/${champStdName}_0.jpg`
+        
+        // Selecting a random riot suplied tip, which are not always available
+        const CHAMP_DETAILS = JSON.parse(FS.readFileSync(`./src/data/${champStdName}/${champStdName}.json`))
+        let champDetail = CHAMP_DETAILS.data[champStdName]
+        let tipCat = "allytips"
+        let choice = Math.floor(Math.random()*2)
+        if (choice === 1) {
+            tipCat = "enemytips"
+        }
+        choice = Math.floor(Math.random() * champDetail[tipCat].length);
+            
+        let champTip = champDetail[tipCat][choice]
+
+        if (typeof(champTip) != "undefined") {
+            champTip = "Rito Super Tip:  " + champTip
+        }
+
+        
         const MESSAGE = new DIS.MessageEmbed()
             .setDescription(blurb)
-            //.setImage(img)
+            .setImage(splashURL)
             .setTitle(champDisplayName + ", " + title)
-            .setFooter("placeholder");
+            .setFooter(champTip);
         
     CHANNEL.send(MESSAGE);
     }
@@ -90,104 +111,6 @@ function listArgs(inputString) {
     let args = inputString
     return args.split(" ")
 }
-
-// Handling command messages and arguments.
-client.on("message", (message) => {
-    const CHANNEL = client.channels.cache.get(message.channel.id);
-    // disabling for dev purposes
-    return
-    // Ignore bots.
-    if (message.author.bot) return;
-    if (message.content.startsWith(PREFIX)) {
-        // using array destructuring to turn a content string into a command name and a list of arguments.
-        // note that this does not work well for arguments with spaces, such as summoner names like Miss Fortune.
-        // TODO refactor to account for e.g. Miss Fortune as a single argument
-        const [CMD_NAME, ...args] = message.content
-            .trim() // trims leading and trailing whitespace
-            .substring(PREFIX.length) // not sure how this works
-            .split(/\s+/); // splits on any amount of whitespace
-        
-        console.log("Command recieved: " + CMD_NAME);
-        console.log("With argument(s): " + args);
-
-        if (CMD_NAME.toLowerCase() === "summoner") {
-            //turning off for now
-            return
-            if (args.length === 1) {
-                message.reply("Yes, you have asked about " + args[0] + ". Here is what I know:");
-                
-                const URL_PART = "summoner/v4/summoners/by-name/" + args[0];
-                const QSTRING = RIOT_NA1 + URL_PART + API_KEY;
-                console.log(QSTRING);
-                AXIOS.get(QSTRING)
-                    .then(function (response) {
-                        
-                        //message.reply(response.data)
-                        message.reply("Summoner Level: " + JSON.stringify(response.data.summonerLevel))
-                    })
-                    .catch(function (error) {
-                        console.log("error: " + error)
-                    })
-                    .then(function () {
-                        console.log("always executed")
-                    });
-            }
-        }
-
-        if (CMD_NAME.toLowerCase() === "whois") {
-            if (args.length === 0 || args[0] == "help") {
-                const MESSAGE =  new DIS.MessageEmbed()
-                    .setTitle("lolbot help")
-                    .setDescription("lolbot whois <champion name>");
-                CHANNEL.send(MESSAGE)
-            }
-            
-            if (args.length >= 1) {
-                // TODO validate against champion list
-                // TODO fix problem with multiple word names e.g. Miss Fortune
-                const CHAMP_NAME = standardizeChampName(args[0]);
-                const QSTRING = `http://ddragon.leagueoflegends.com/cdn/10.25.1/data/en_US/champion/${CHAMP_NAME[0]}.json`;
-                console.log(QSTRING);
-                AXIOS.get(QSTRING)
-                    .then(function (response) {
-                        let champ = response.data.data[CHAMP_NAME[0]];
-                        let desc = champ.lore;
-                        let img = `http://ddragon.leagueoflegends.com/cdn/img/champion/splash/${CHAMP_NAME[0]}_0.jpg`;
-                        let tip = function () {
-                            let tipCat = "allytips";
-                            let choice = Math.floor(Math.random()*2);
-                            if (choice === 1) {
-                                tipCat = "enemytips"
-                            }
-                            choice = Math.floor(Math.random() * champ[tipCat].length);
-                            
-                            let tip = champ[tipCat][choice];
-                            if (typeof(tip) != "undefined") {
-                                return "Rito Super Tip:  " + tip
-                            }
-                            return ""
-                            
-                        }
-                        // Construct an embedded message object
-                        // see https://DISjs.guide/popular-topics/embeds.html#embed-preview
-                        const MESSAGE = new DIS.MessageEmbed()
-                            .setDescription(desc)
-                            .setImage(img)
-                            .setTitle(CHAMP_NAME[1])
-                            .setFooter(tip());
-                            
-                        CHANNEL.send(MESSAGE);
-                    })
-                    .catch(function (error) {
-                        console.log("error: " + error)
-                    });
-
-            }
-        }
-    }
-});
-
-
 
 function standardizeChampName(inputString) {
     standardName = capFirstLetter(inputString);
@@ -207,7 +130,7 @@ function standardizeChampName(inputString) {
         displayName = "Teemo"
     }
 
-    if (standardName === "Miss" || standardName === "Mf") {
+    if (standardName === "Miss fortune" || standardName === "Mf") {
         standardName = "MissFortune";
         displayName = "Miss Fortune"
     }
@@ -222,7 +145,7 @@ function standardizeChampName(inputString) {
         displayName = "Tahm Kench"
     }
 
-    return [standardName,displayName]
+    return {"standardName":standardName,"displayName":displayName}
 }
 
 function capFirstLetter(inputString) {

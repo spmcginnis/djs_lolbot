@@ -3,6 +3,7 @@ const { Client } = require('discord.js'); // Client extends EventEmitter
 const DIS = require('discord.js');
 const AXIOS = require('axios');
 const FS = require('fs');
+const NAMES = require('./names.js');
 
 const API_KEY = "?api_key=" + process.env.RIOT_DEV_TEMP_TOKEN;
 const RIOT_NA1 = "https://na1.api.riotgames.com/lol/";
@@ -68,11 +69,11 @@ client.on("message", (message) => {
         
         const CHAMP_LIST = JSON.parse(FS.readFileSync("./src/data/champion.json", "utf-8"))
         
-        let champStdName = standardizeChampName(ARG_STRING).standardName // TODO handle bad input
+        let champStdName = NAMES.standardize(ARG_STRING).standardName // TODO handle bad input
 
         console.log("champStdName: ", champStdName)
         
-        let champDisplayName = standardizeChampName(ARG_STRING).displayName
+        let champDisplayName = NAMES.standardize(ARG_STRING).displayName
         let blurb = CHAMP_LIST.data[champStdName].blurb
         let title = CHAMP_LIST.data[champStdName].title
         let splashURL = `http://ddragon.leagueoflegends.com/cdn/img/champion/splash/${champStdName}_0.jpg`
@@ -112,122 +113,16 @@ function listArgs(inputString) {
     return args.split(" ")
 }
 
-function standardizeChampName(inputString) {
-    standardName = capFirstLetter(inputString);
-    displayName = standardName;
-    if (standardName === "Kai'sa" || standardName === "Kaisa") {
-        standardName = "Kaisa";
-        displayName = "Kai'Sa"
-    }
+// Champion Abilities
+// .data[{champ name}].spells[0 through 3] or ...spells["id": "AatroxQ"]
+// .data[{champ name}].passive
 
-    if (standardName === "Susan") {
-        standardName = "Nasus";
-        displayName = "Susan"
-    }
 
-    if (standardName === "Devil") {
-        standardName = "Teemo";
-        displayName = standardName
-    }
 
-    if (standardName === "Miss fortune" || standardName === "Mf") {
-        standardName = "MissFortune";
-        displayName = "Miss Fortune"
-    }
 
-    if (standardName === "Kha'zix") {
-        standardName = "Khazix";
-        displayName = "Kha'Zix"
-    }
 
-    if (standardName === "Tahm" || standardName === "Kench") {
-        standardName = "TahmKench";
-        displayName = "Tahm Kench"
-    }
-    if (standardName === "Voli") {
-        standardName = "Volibear";
-        displayName = standardName
-    }
 
-    if (standardName === "Wu kong" || standardName === "Monkeyking") {
-        standardName = "MonkeyKing";
-        displayName = "Wu Kong"
-    }
 
-    if (standardName === "200 years") {
-        standardName = "Aphelios";
-        displayName = standardName
-    }
-
-    if (standardName === "Aurelion sol" || standardName === "Asol" || standardName === "A-sol" || standardName === "A sol") {
-        standardName = "AurelionSol";
-        displayName = "Aurelion Sol"
-    }
-
-    if (standardName === "Blitz") {
-        standardName = "Blitzcrank";
-        displayName = standardName
-    }
-
-    if (standardName === "Dr. mundo" || standardName === "Dr mundo" || standardName === "Mundo" || standardName === "Doctor Mundo") {
-        standardName = "DrMundo";
-        displayName = "Dr. Mundo"
-    }
-
-    if (standardName === "Jarvan" || standardName === "J4" || standardName === "Jiv" || standardName === "J 4" || standardName === "Jarvan iv") {
-        standardName = "JarvanIV";
-        displayName = "Jarvan IV"
-    }
-
-    if (standardName === "Kog'maw" || standardName === "Kog maw" || standardName === "Kogmaw") {
-        standardName = "KogMaw";
-        displayName = "Kog'Maw"
-    }
-
-    if (standardName === "Leblanc" || standardName === "Le blanc" || standardName === "Lb") {
-        standardName = "Leblanc";
-        displayName = "LeBlanc"
-    }
-
-    if (standardName === "Lee" || standardName === "Leesin" || standardName === "Lee sin") {
-        standardName = "LeeSin";
-        displayName = "Lee Sin"
-    }
-
-    if (standardName === "Master yi" || standardName === "Yi") {
-        standardName = "MasterYi";
-        displayName = "Master Yi"
-    }
-
-    if (standardName === "Rek'sai" || standardName === "Reksai" || standardName === "Rek sai") {
-        standardName = "RekSai";
-        displayName = "Rek'Sai"
-    }
-
-    if (standardName === "Tf" || standardName === "Twisted fate" || standardName === "Twistedfate") {
-        standardName = "TwistedFate";
-        displayName = "Twisted Fate"
-    }
-
-    if (standardName === "Vel'koz" || standardName === "Velkoz" || standardName === "Vel koz") {
-        standardName = "Velkoz";
-        displayName = "Vel'Koz"
-    }
-
-    if (standardName === "Xin zhao" || standardName === "Xin" || standardName === "Xinzhao") {
-        standardName = "XinZhao";
-        displayName = "Xin Zhao"
-    }
-
-    
-
-    return {"standardName":standardName,"displayName":displayName}
-}
-
-function capFirstLetter(inputString) {
-    inputString = inputString.toLowerCase();
-    return inputString.charAt(0).toUpperCase() + inputString.slice(1)
-}
 
 
 // Riot API Examples

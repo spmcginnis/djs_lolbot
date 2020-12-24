@@ -10,6 +10,10 @@ A Discord bot using discord.js to query champion data from the Riot Games API.
 - Summoner info
 - External tips
 - Champion stats and tier lists
+- Make a skins carousel
+- Champion stat blocks with base stats (need to deal with riot's inline xml and interpolations)
+- Champion stat blocks with symbols
+- Champion stat blocks with level up
 
 ## Completed
 - Responds to Discord commands with prefix "lolbot "

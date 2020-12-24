@@ -14,6 +14,9 @@ let client = new Client();
 // set prefix
 const PREFIX = "lolbot ";
 const VALID_COMMANDS = ["whois", "help", "ability"]
+const HELP_MSG1 = "For help, enter `lolbot help`."
+const HELP_MSG2 = "Placeholder for help message."
+
 // log the bot in
 client.login(process.env.DISCORDJS_BOT_TOKEN);
 
@@ -41,7 +44,7 @@ client.on("message", (message) => {
     }
 
     if (message.content.startsWith(PREFIX.trim()) && message.content.length <= PREFIX.length) {
-        message.reply("Placeholder for help message.")
+        message.reply(`Hello!  I'm lolbot and *definitely* not Blitzcrank.  ${HELP_MSG1}`)
         return
     }
 
@@ -63,7 +66,7 @@ client.on("message", (message) => {
     const CMD_NAME = CMD_STRING.split(" ")[0]
 
     if (!VALID_COMMANDS.includes(CMD_NAME)) {
-        message.reply("that command is not valid. For help, enter \"lolbot help\".")
+        message.reply(`that command is not valid. ${HELP_MSG1}`)
         return 
     }
 
@@ -76,12 +79,12 @@ client.on("message", (message) => {
     console.log(`and args as list: ${ARG_LIST}`)
 
     if (CMD_NAME === "help") {
-        message.reply("Placeholder for help text.")
+        message.reply(HELP_MSG2)
     }
 
     if (CMD_NAME === "whois") {
         if (ARG_STRING.length === 0) {
-            message.reply("that command requires a champion name. For help, enter \"lolbot help\".")
+            message.reply(`that command requires a champion name. ${HELP_MSG1}.`)
             return
         }    
         const CHAMP_LIST = JSON.parse(FS.readFileSync("./src/data/champion.json", "utf-8"))
@@ -121,22 +124,73 @@ client.on("message", (message) => {
     }
 
     if (CMD_NAME.toLowerCase() === "ability") {
-        // check the last argument for q/w/e/r/passive and store
-        
+        let validArgs = ['q','w','e','r','passive','ult','ultimate']
+        let ability = ARG_LIST[ARG_LIST.length -1].toLowerCase()
+
+
+
+        if (ARG_STRING.length === 0) {
+            message.reply(`I need more information.  ${HELP_MSG1}`)
+            return
+        }
+        // check the last argument for q/w/e/r/passive
+        if (!validArgs.includes(ability)) {
+            message.reply(`I don't understand that command.  ${HELP_MSG1}`)
+            return
+        }
         
         // pop the last argument and convert the remaining list to a string
-        let ability = "q"
+        let champion = ARG_LIST
+        champion.pop()
+        champion = champion.join(' ')
+        console.log("champion in arg list: ", champion)
 
         // standardize the name string
-        let champStdName = "Janna"
+        let champStdName = NAMES.standardize(champion).standardName
+        let champDisplayName = NAMES.standardize(champion).displayName
+        console.log(champStdName)
+
         // query the data
         const CHAMP_DETAILS = JSON.parse(FS.readFileSync(`./src/data/${champStdName}/${champStdName}.json`))
 
-        
+        let abilityEnum = {
+            'q':0,
+            'w':1,
+            'e':2,
+            'r':3,
+            'ult':3,
+            'ultimate':3,
+            0:'Q',
+            1:'W',
+            2:'E',
+            3:'R',
+            "passive":"Passive",
+            "Passive":"Passive"
+        }
 
+        let spellDetail
+        let toolTip
+        if (ability!=="passive") {
+            spellDetail = CHAMP_DETAILS.data[champStdName].spells[abilityEnum[ability]]
+            toolTip = spellDetail.tooltip
+        } else {
+            spellDetail = CHAMP_DETAILS.data[champStdName].passive
+        }
 
+        let spellName = spellDetail.name
+        let title = `${spellName} (${champDisplayName} ${abilityEnum[abilityEnum[ability]]})`
+        let desc = spellDetail.description
 
         // initialize a message object and send it to channel
+        const MESSAGE = new DIS.MessageEmbed()
+            .setTitle(title)
+            .setDescription(desc)
+            
+            //TODO .setImage()
+
+        CHANNEL.send(MESSAGE)
+
+
     }
 })
 

@@ -2,10 +2,11 @@
 A Discord bot using discord.js to query champion data from the Riot Games API.
 
 ## TODO
-- Get champion ability info
+
 - Get champion ability icons
 - Summoner spell info (lolbot summs)
 - Command string validation
+- Handle Riot's inline XML and interpolations in the ability descriptions
 
 ## Desirable Features
 - Summoner info
@@ -24,6 +25,7 @@ A Discord bot using discord.js to query champion data from the Riot Games API.
 - Refactor whois to query the cached files
 - Account for all champion names and some common nicknames
 - Command name validation
+- lolbot returns champion ability info
 
 ## Using
 - node

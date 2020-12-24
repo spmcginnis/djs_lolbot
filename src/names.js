@@ -5,8 +5,8 @@ function capFirstLetter(inputString) {
 
 module.exports = {
     standardize: (inputString) => {
-            standardName = capFirstLetter(inputString);
-            displayName = standardName;
+            let standardName = capFirstLetter(inputString);
+            let displayName = standardName;
 
             // there has to be a better way to do this
             if (standardName === "Kai'sa" || standardName === "Kaisa") {
@@ -17,11 +17,11 @@ module.exports = {
                 standardName = "Nasus";
                 displayName = "Susan";
             }
-            if (standardName === "Devil") {
+            if (standardName === "Devil" || standardName === "The devil") {
                 standardName = "Teemo";
                 displayName = standardName;
             }
-            if (standardName === "Miss fortune" || standardName === "Mf") {
+            if (standardName === "Miss fortune" || standardName === "Mf" || standardName === "Missfortune") {
                 standardName = "MissFortune";
                 displayName = "Miss Fortune";
             }
@@ -93,6 +93,7 @@ module.exports = {
                 standardName = "XinZhao";
                 displayName = "Xin Zhao";
             }
+
             return { "standardName": standardName, "displayName": displayName };
         }
 }

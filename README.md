@@ -2,8 +2,14 @@
 A Discord bot using discord.js to query champion data from the Riot Games API.
 
 ## TODO
-- Account for all champion names and some common nicknames
-- Generate alias.json index of champion names and ids.
+- Get champion ability info
+- Get champion ability icons
+- Summoner spell info (lolbot summs)
+
+## Desirable Features
+- Summoner info
+- External tips
+- Champion stats and tier lists
 
 ## Completed
 - Responds to Discord commands with prefix "lolbot "
@@ -11,6 +17,7 @@ A Discord bot using discord.js to query champion data from the Riot Games API.
 - Refactor to fetch the champion data and store as local json.
 - Refactor to fetch the champion splash art
 - Refactor whois to query the cached files
+- Account for all champion names and some common nicknames
 
 ## Using
 - node

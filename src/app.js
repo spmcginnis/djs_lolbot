@@ -9,11 +9,11 @@ const API_KEY = "?api_key=" + process.env.RIOT_DEV_TEMP_TOKEN;
 const RIOT_NA1 = "https://na1.api.riotgames.com/lol/";
 
 // init client object
-const client = new Client();
+let client = new Client();
 
 // set prefix
 const PREFIX = "lolbot ";
-
+const VALID_COMMANDS = ["whois", "help", "ability"]
 // log the bot in
 client.login(process.env.DISCORDJS_BOT_TOKEN);
 
@@ -23,15 +23,15 @@ client.on('ready', () => {
     console.log(`${client.user.tag} has logged in.`)
 });
 
-
+// Example event handler
 // Callback function takes the message object as a parameter
 client.on('message', (message) => {
     // ignores messages from bots
     if (message.author.bot) return;
 
     // Reply on the basis of the content of a message
-    if (message.content === "Hello Bot") {
-        message.reply("Good day to you as well!")
+    if (message.content === "Hello lolbot") {
+        message.reply("Hello!")
     }
 });
 
@@ -41,32 +41,49 @@ client.on("message", (message) => {
     }
 
     if (message.content.startsWith(PREFIX.trim()) && message.content.length <= PREFIX.length) {
-        message.reply("Placeholder for help message")
+        message.reply("Placeholder for help message.")
         return
     }
 
-    // prefix detected with at least one argument
+    if (!message.content.startsWith(PREFIX)) {
+        return
+    }
+    // If the prefix detected with at least one argument...
 
     // get channel id
     const CHANNEL = client.channels.cache.get(message.channel.id);
 
     // store command and args as a string
-    const CMD_LINE = message.content
+    const CMD_STRING = message.content
         .substring(PREFIX.length) // remove the prefix
         .trim()
         .replace(/\s+/, " ") // replace any number of blankspaces with just one
         .toLowerCase()
 
-    const CMD_NAME = CMD_LINE.split(" ")[0]
-    const ARG_STRING = CMD_LINE
+    const CMD_NAME = CMD_STRING.split(" ")[0]
+
+    if (!VALID_COMMANDS.includes(CMD_NAME)) {
+        message.reply("that command is not valid. For help, enter \"lolbot help\".")
+        return 
+    }
+
+    const ARG_STRING = CMD_STRING
         .substring(CMD_NAME.length)
         .trim()
+    const ARG_LIST = listArgs(ARG_STRING)
 
     console.log(`Command: ${CMD_NAME} recieved with arguments: ${ARG_STRING}`)
-    console.log(`and args as list: ${listArgs(ARG_STRING)}`)
+    console.log(`and args as list: ${ARG_LIST}`)
+
+    if (CMD_NAME === "help") {
+        message.reply("Placeholder for help text.")
+    }
 
     if (CMD_NAME === "whois") {
-        
+        if (ARG_STRING.length === 0) {
+            message.reply("that command requires a champion name. For help, enter \"lolbot help\".")
+            return
+        }    
         const CHAMP_LIST = JSON.parse(FS.readFileSync("./src/data/champion.json", "utf-8"))
         
         let champStdName = NAMES.standardize(ARG_STRING).standardName // TODO handle bad input
@@ -93,25 +110,38 @@ client.on("message", (message) => {
         if (typeof(champTip) != "undefined") {
             champTip = "Rito Super Tip:  " + champTip
         }
-
         
         const MESSAGE = new DIS.MessageEmbed()
             .setDescription(blurb)
             .setImage(splashURL)
             .setTitle(champDisplayName + ", " + title)
             .setFooter(champTip);
-        
-    CHANNEL.send(MESSAGE);
+
+        CHANNEL.send(MESSAGE);
     }
 
+    if (CMD_NAME.toLowerCase() === "ability") {
+        // check the last argument for q/w/e/r/passive and store
+        
+        
+        // pop the last argument and convert the remaining list to a string
+        let ability = "q"
 
-    
+        // standardize the name string
+        let champStdName = "Janna"
+        // query the data
+        const CHAMP_DETAILS = JSON.parse(FS.readFileSync(`./src/data/${champStdName}/${champStdName}.json`))
+
+        
+
+
+
+        // initialize a message object and send it to channel
+    }
 })
 
-function listArgs(inputString) {
-    let args = inputString
-    return args.split(" ")
-}
+
+
 
 // Champion Abilities
 // .data[{champ name}].spells[0 through 3] or ...spells["id": "AatroxQ"]
@@ -119,6 +149,10 @@ function listArgs(inputString) {
 
 
 
+function listArgs(inputString) {
+    let args = inputString
+    return args.split(" ")
+}
 
 
 

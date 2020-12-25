@@ -2,4 +2,3 @@ node_modules/
 .env
 samples/
 src/promise-testing.js
-src/data/*

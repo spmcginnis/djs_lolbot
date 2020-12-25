@@ -7,6 +7,8 @@ const AXIOS = require('axios');
 // Champion splash art: http://ddragon.leagueoflegends.com/cdn/img/champion/splash/Aatrox_0.jpg
 const ROOT = "http://ddragon.leagueoflegends.com/cdn/";
 const PATCH = "10.25.1/";
+//TODO get patch from versions list https://ddragon.leagueoflegends.com/api/versions.json
+
 const BRANCH_CHAMP_LIST =  "data/en_US/";
 const BRANCH_CHAMP_DETAILS = "data/en_US/champion/"
 const BRANCH_SPLASH = "img/champion/splash/"

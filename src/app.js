@@ -180,27 +180,26 @@ client.on("message", (message) => {
         let spellName = spellDetail.name
         let title = `${spellName} (${champDisplayName} ${abilityEnum[abilityEnum[ability]]})`
         let desc = spellDetail.description
+        let thumbnail = `http://ddragon.leagueoflegends.com/cdn/10.25.1/img/spell/${spellDetail.image.full}`
 
         // initialize a message object and send it to channel
         const MESSAGE = new DIS.MessageEmbed()
+            .setColor("DARK_GREEN")
             .setTitle(title)
             .setDescription(desc)
-            
-            //TODO .setImage()
+            .setThumbnail(thumbnail)
+
+        // TODO parse tooltips
+        // if (toolTip) {
+        //     MESSAGE.setFooter(toolTip)
+        // }
+
 
         CHANNEL.send(MESSAGE)
 
 
     }
 })
-
-
-
-
-// Champion Abilities
-// .data[{champ name}].spells[0 through 3] or ...spells["id": "AatroxQ"]
-// .data[{champ name}].passive
-
 
 
 function listArgs(inputString) {
@@ -217,6 +216,14 @@ function listArgs(inputString) {
 // Single file with limited info on each champion: http://ddragon.leagueoflegends.com/cdn/10.25.1/data/en_US/champion.json
 // Champion details file: http://ddragon.leagueoflegends.com/cdn/10.25.1/data/en_US/champion/Aatrox.json
 // Champion splash art: http://ddragon.leagueoflegends.com/cdn/img/champion/splash/Aatrox_0.jpg
+// Champion passive: http://ddragon.leagueoflegends.com/cdn/10.25.1/img/passive/Anivia_P.png
+// Champion ability: http://ddragon.leagueoflegends.com/cdn/10.25.1/img/spell/FlashFrost.png
+// Item: http://ddragon.leagueoflegends.com/cdn/10.25.1/img/spell/FlashFrost.png
+// Sprite sheets: http://ddragon.leagueoflegends.com/cdn/10.25.1/img/sprite/spell0.png
+
+// Other images
+// Additional skins are shown in e.g. Aatrox_1.png, Aatrox_2.png, etc.
+// Thumbnail: http://ddragon.leagueoflegends.com/cdn/10.25.1/img/champion/Aatrox.png
 
 // Example query Riot API for summoner info (with API_KEY)
 // function getSummonerInfo (inputString) {

@@ -14,6 +14,7 @@ A Discord bot using discord.js to query champion data from the Riot Games API.
 - Champion stat blocks with base stats (need to deal with riot's inline xml and interpolations)
 - Champion stat blocks with symbols
 - Champion stat blocks with level up
+- lolbot quiz
 
 ## Completed
 - Responds to Discord commands with prefix "lolbot "

@@ -90,16 +90,17 @@ client.on("message", (message) => {
         const CHAMP_LIST = JSON.parse(FS.readFileSync("./src/data/champion.json", "utf-8"))
         
         let champStdName = NAMES.standardize(ARG_STRING).standardName // TODO handle bad input
+        const CHAMP_DETAILS = JSON.parse(FS.readFileSync(`./src/data/${champStdName}/${champStdName}.json`))
 
         console.log("champStdName: ", champStdName)
         
         let champDisplayName = NAMES.standardize(ARG_STRING).displayName
-        let blurb = CHAMP_LIST.data[champStdName].blurb
-        let title = CHAMP_LIST.data[champStdName].title
+        let blurb = CHAMP_DETAILS.data[champStdName].lore
+        let title = CHAMP_DETAILS.data[champStdName].title
         let splashURL = `http://ddragon.leagueoflegends.com/cdn/img/champion/splash/${champStdName}_0.jpg`
         
         // Selecting a random riot suplied tip, which are not always available
-        const CHAMP_DETAILS = JSON.parse(FS.readFileSync(`./src/data/${champStdName}/${champStdName}.json`))
+        
         let champDetail = CHAMP_DETAILS.data[champStdName]
         let tipCat = "allytips"
         let choice = Math.floor(Math.random()*2)

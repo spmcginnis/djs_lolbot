@@ -9,6 +9,11 @@ module.exports = {
             let displayName = standardName;
 
             // there has to be a better way to do this
+            if (standardName === "Your dad") {
+                standardName = "Seraphine";
+                displayName = "Your Dad"
+            }
+            
             if (standardName === "Kai'sa" || standardName === "Kaisa") {
                 standardName = "Kaisa";
                 displayName = "Kai'Sa";

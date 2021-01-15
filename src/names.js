@@ -102,3 +102,17 @@ module.exports = {
             return { "standardName": standardName, "displayName": displayName };
         }
 }
+
+/*
+standard = {
+    
+    "mf" : "MissFortune"
+    
+}
+display = {
+    "MissFortune" : "Miss Fortune"
+}
+
+// Incorporate metaphone and/or levenshtein distance.  See also "edit distance"
+
+*/ 

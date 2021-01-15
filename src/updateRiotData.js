@@ -6,7 +6,7 @@ const AXIOS = require('axios');
 // Champion details file: http://ddragon.leagueoflegends.com/cdn/10.25.1/data/en_US/champion/Aatrox.json
 // Champion splash art: http://ddragon.leagueoflegends.com/cdn/img/champion/splash/Aatrox_0.jpg
 const ROOT = "http://ddragon.leagueoflegends.com/cdn/";
-const PATCH = "10.25.1/";
+const PATCH = "11.1.1/"
 //TODO get patch from versions list https://ddragon.leagueoflegends.com/api/versions.json
 
 const BRANCH_CHAMP_LIST =  "data/en_US/";
@@ -127,6 +127,14 @@ async function setEtag(etag) {
     return FS.writeFileSync("./src/data/etag.txt", etag)
 }
 
+async function getPatch() {
+    return { data } = await AXIOS.get("https://ddragon.leagueoflegends.com/api/versions.json")
+   
+}
+
+// const { data } = await axios.get(url);
+// Equivalent to `const data = await axios.get(url).then(res => res.data)`
+
 async function main () {
     // check if data directory exists and make it if it doesn't
     MKDIR(`./src/data`)
@@ -139,6 +147,7 @@ async function main () {
     
     updateChampions()
 }
+
 
 main()
 

@@ -126,7 +126,7 @@ client.on("message", (message) => {
 
     if (CMD_NAME.toLowerCase() === "ability") {
         let validArgs = ['q','w','e','r','passive','ult','ultimate']
-        let ability = ARG_LIST[ARG_LIST.length -1].toLowerCase()
+        let abilityKey = ARG_LIST[ARG_LIST.length -1].toLowerCase()
 
         // check for at least two arguments
         if (ARG_LIST.length <= 1) {
@@ -135,10 +135,10 @@ client.on("message", (message) => {
         }
 
         // TODO check the first argument for valid champ name
-        
+
 
         // check the last argument for q/w/e/r/passive
-        if (!validArgs.includes(ability)) {
+        if (!validArgs.includes(abilityKey)) {
             message.reply(`I don't understand that command.  ${HELP_MSG1}`)
             return
         }
@@ -174,15 +174,15 @@ client.on("message", (message) => {
 
         let spellDetail
         let toolTip
-        if (ability!=="passive") {
-            spellDetail = CHAMP_DETAILS.data[champStdName].spells[abilityEnum[ability]]
+        if (abilityKey!=="passive") {
+            spellDetail = CHAMP_DETAILS.data[champStdName].spells[abilityEnum[abilityKey]]
             toolTip = spellDetail.tooltip
         } else {
             spellDetail = CHAMP_DETAILS.data[champStdName].passive
         }
 
         let spellName = spellDetail.name
-        let title = `${spellName} (${champDisplayName} ${abilityEnum[abilityEnum[ability]]})`
+        let title = `${spellName} (${champDisplayName} ${abilityEnum[abilityEnum[abilityKey]]})`
         let desc = spellDetail.description
         let thumbnail = `http://ddragon.leagueoflegends.com/cdn/10.25.1/img/spell/${spellDetail.image.full}`
 

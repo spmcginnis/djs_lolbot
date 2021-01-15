@@ -6,6 +6,8 @@ A Discord bot using discord.js to query champion data from the Riot Games API.
 - Command string validation
 - Handle Riot's inline XML and interpolations in the ability descriptions
 - Validate whois by refactoring with a names enum
+- Incorporate metaphone and/or levenshtein distance into the validation system.  See also "edit distance"
+- Refactor names dictionary to be produced as a part of the update script.
 
 ## Desirable Features
 - Summoner info

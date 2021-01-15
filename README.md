@@ -5,6 +5,7 @@ A Discord bot using discord.js to query champion data from the Riot Games API.
 - Summoner spell info (lolbot summs)
 - Command string validation
 - Handle Riot's inline XML and interpolations in the ability descriptions
+- Validate whois by refactoring with a names enum
 
 ## Desirable Features
 - Summoner info

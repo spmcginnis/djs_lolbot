@@ -128,12 +128,15 @@ client.on("message", (message) => {
         let validArgs = ['q','w','e','r','passive','ult','ultimate']
         let ability = ARG_LIST[ARG_LIST.length -1].toLowerCase()
 
-
-
-        if (ARG_STRING.length === 0) {
+        // check for at least two arguments
+        if (ARG_LIST.length <= 1) {
             message.reply(`I need more information.  ${HELP_MSG1}`)
             return
         }
+
+        // TODO check the first argument for valid champ name
+        
+
         // check the last argument for q/w/e/r/passive
         if (!validArgs.includes(ability)) {
             message.reply(`I don't understand that command.  ${HELP_MSG1}`)
